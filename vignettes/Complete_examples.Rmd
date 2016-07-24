@@ -1,0 +1,69 @@
+---
+title: "Ungeneanno: Complete example"
+author: "Richard Thompson"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Ungeneanno: Complete example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+UNGeneAnno is written to enable the rapid collation of gene details from publicly available databases, initially those being the NCBI gene and Uniprot databases. 
+
+Further to the original aim, the package also includes the \code{getPublicationList} function which will returns a vector of objects detailing the results of a search of the NCBI PubMed database.
+
+*Nota Bene:* The package was originally written to collate gene information from Uniport and NIH/NCBI databases, thus alleviating repetitive multiple searches. The aim was both to speed up accessing this data and minimise the number of database calls. This vignette outlines how this is acheived.
+
+
+## initial input from file
+A typical workflow begins with a matrix, wherethe first column represents a group identifier, \code{numeric} or \code{character}, and the second, gene names.
+
+    1   BRAF.exp
+    1   BRCA2.mut
+    2   BRAF.cnv
+    2   AURKB.mut
+    2   PTEN.exp
+
+The \code{getuniquegenelist()} method parses the input file into a vector of character strings containing only the initial alphanumeric characters, so the above is treat as:
+
+    1   BRAF
+    1   BRCA2
+    2   BRAF
+    2   AURKB
+    2   PTEN
+
+once the matrix is passed to \code{getuniquegenelist()}, A geneanno object is populated with unique lists of both the group identifiers and gene names:
+
+    geneanno <- getUniqueGeneList(geneanno(),matrix)
+
+
+## Getting Gene objects
+Once these lists have been populated, the summary information can be sourced from the databases; returning a vector of \code{gene} objects containing the downloaded details for each gene.
+
+    genesummaries <- getGeneSummary(geneanno)
+
+*Nota Bene:* Once the details have been downloaded, the gene object is saved to a subdirectory, defaults to "genes" which is created in the working directory; However the main directory can be amended using \code{geneanno@fileroot <- </path/to/directory>}.
+Prior to downloading, the method will check for a saved gene object younger than seven days and preferentially use any saved objects it finds. This is to minimize repeatedly accessing the database servers with the same query.
+
+## Producing output files
+The final task is to produce output files for each group identifier listing details of the genes related to it in the original \code{inputlist}.
+
+    groupgenelist <- getGroupGeneList(geneanno,matrix)
+    produceOutputFiles(geneanno, groupgenelist, genesummaries)
+
+Output files are saved in a subdirectory, default "gene_annotations", of the working directory, unless an alternative directory has been provided by \code{geneanno@fileroot <- </path/to/directory>}.
+Currently, the files are created as plain text files, named by the group identifiers,  containing all the details stored in the \code{gene} objects.
+
+## Queries to the NCBI Pubmed Database
+In addition to it's core function the package also incorporates a function to access the NCBI Pubmed database and collate a list of publications for a query. The function will take any query you would use on the PubMed search page directly.
+
+    ReturnedPublications <- getPublicationList(query)
+    
+The returned list contains objects having specific slots for Pubmed ID, Author list, Title, Journal Name, Volume, Issue, Page Numbers and DOI.
+Indivdual publications can be accessed by index, for example, to get the Pubmed IDs of the returned publications:
+
+    for (i in 1:length(ReturnedPublications)){
+      print(ReturnedPublications[[i]]@Id)
+    }
+
