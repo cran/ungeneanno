@@ -12,9 +12,9 @@
 
 <meta name="author" content="Richard Thompson" />
 
-<meta name="date" content="2016-07-24" />
+<meta name="date" content="2016-09-21" />
 
-<title>Ungeneanno: PubMed Journal Query example</title>
+<title>UNGeneAnno: PubMed Journal Query example</title>
 
 
 
@@ -30,20 +30,25 @@
 
 
 
-<h1 class="title toc-ignore">Ungeneanno: PubMed Journal Query example</h1>
+<h1 class="title toc-ignore">UNGeneAnno: PubMed Journal Query example</h1>
 <h4 class="author"><em>Richard Thompson</em></h4>
-<h4 class="date"><em>2016-07-24</em></h4>
+<h4 class="date"><em>2016-09-21</em></h4>
 
 
 
 <p>UNGeneAnno is written to enable the rapid collation of gene details from publicly available databases, initially those being the NCBI gene and Uniprot databases.</p>
-<p>Further to the original aim, the package also includes the  function which will returns a vector of objects detailing the results of a search of the NCBI PubMed database.</p>
-<p><em>Nota Bene:</em> The package was originally written to collate gene information from Uniport and NIH/NCBI databases, thus alleviating repetitive multiple searches. The aim was both to speed up accessing this data and minimise the number of database calls. This vignette outlines how this is acheived.</p>
+<p>Further to the original aim, the package also includes the <code>searchPublications</code> and <code>getPublicationList</code> function which will return either a matrix or vector of objects detailing the results of NCBI PubMed database searches.</p>
+<p><em>Nota Bene:</em> The package was originally written to collate gene information from Uniport and NIH/NCBI databases, thus alleviating repetitive multiple searches. The aim was both to speed up accessing this data and minimise the number of database calls. This vignette outlines how this is acheived specifically for the PubMed database.</p>
 <div id="queries-to-the-ncbi-pubmed-database" class="section level2">
 <h2>Queries to the NCBI Pubmed Database</h2>
 <p>In addition to it’s core function the package also incorporates a function to access the NCBI Pubmed database and collate a list of publications for a query. The function will take any query you would use on the PubMed search page directly.</p>
-<pre><code>ReturnedPublications &lt;- getPublicationList(query)</code></pre>
-<p>The returned list contains objects having specific slots for Pubmed ID, Author list, Title, Journal Name, Volume, Issue, Page Numbers and DOI. Indivdual publications can be accessed by index, for example, to get the Pubmed IDs of the returned publications:</p>
+<pre><code>query &lt;- &quot;Thompson HIV&quot;
+ReturnedPublications &lt;- getPublicationList(query)</code></pre>
+<p>Alternatively, the <code>searchPublications</code> function wraps <code>getPublicationList</code> such that a simple matrix can be used to return a matrix containing the results of multiple searches</p>
+<pre><code>matrix &lt;- matrix(c(&quot;Axitinib&quot;,&quot;BRAF&quot;,&quot;Imatinib&quot;,&quot;BRAF&quot;,&quot;Axitinib&quot;,&quot;PTEN&quot;,&quot;Imatinib&quot;,&quot;SMURF2&quot;)
+  ,ncol=2,byrow=TRUE)
+publicationmatrix &lt;- searchPublications(matrix)</code></pre>
+<p><code>getPublicationList</code> returns a list containing <code>pubmed</code> class objects having specific slots for Pubmed ID, Author list, Title, Journal Name, Volume, Issue, Page Numbers and DOI. <code>searchPublications</code> returns a 2 column matrix where each row contains the search term and the list of <code>pubmed</code> objects. Individual publications can be accessed by index, for example, to get the Pubmed IDs of the returned publications:</p>
 <pre><code>for (i in 1:length(ReturnedPublications)){
   print(ReturnedPublications[[i]]@Id)
 }</code></pre>

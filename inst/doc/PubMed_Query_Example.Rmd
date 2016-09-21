@@ -1,27 +1,34 @@
 ---
-title: "Ungeneanno: PubMed Journal Query example"
+title: "UNGeneAnno: PubMed Journal Query example"
 author: "Richard Thompson"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Ungeneanno: PubMed Journal Query example}
+  %\VignetteIndexEntry{UNGeneAnno: PubMed Journal Query example}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 UNGeneAnno is written to enable the rapid collation of gene details from publicly available databases, initially those being the NCBI gene and Uniprot databases. 
 
-Further to the original aim, the package also includes the \code{getPublicationList} function which will returns a vector of objects detailing the results of a search of the NCBI PubMed database.
+Further to the original aim, the package also includes the `searchPublications` and `getPublicationList` function which will return either a matrix or vector of objects detailing the results of NCBI PubMed database searches.
 
-*Nota Bene:* The package was originally written to collate gene information from Uniport and NIH/NCBI databases, thus alleviating repetitive multiple searches. The aim was both to speed up accessing this data and minimise the number of database calls. This vignette outlines how this is acheived.
+*Nota Bene:* The package was originally written to collate gene information from Uniport and NIH/NCBI databases, thus alleviating repetitive multiple searches. The aim was both to speed up accessing this data and minimise the number of database calls. This vignette outlines how this is acheived specifically for the PubMed database.
 
 ## Queries to the NCBI Pubmed Database
 In addition to it's core function the package also incorporates a function to access the NCBI Pubmed database and collate a list of publications for a query. The function will take any query you would use on the PubMed search page directly.
 
+    query <- "Thompson HIV"
     ReturnedPublications <- getPublicationList(query)
     
-The returned list contains objects having specific slots for Pubmed ID, Author list, Title, Journal Name, Volume, Issue, Page Numbers and DOI.
-Indivdual publications can be accessed by index, for example, to get the Pubmed IDs of the returned publications:
+Alternatively, the `searchPublications` function wraps `getPublicationList` such that a simple matrix can be used to return a matrix containing the results of multiple searches
+
+    matrix <- matrix(c("Axitinib","BRAF","Imatinib","BRAF","Axitinib","PTEN","Imatinib","SMURF2")
+      ,ncol=2,byrow=TRUE)
+    publicationmatrix <- searchPublications(matrix)
+    
+`getPublicationList` returns a list containing `pubmed` class objects having specific slots for Pubmed ID, Author list, Title, Journal Name, Volume, Issue, Page Numbers and DOI. `searchPublications` returns a 2 column matrix where each row contains the search term and the list of `pubmed` objects.
+Individual publications can be accessed by index, for example, to get the Pubmed IDs of the returned publications:
 
     for (i in 1:length(ReturnedPublications)){
       print(ReturnedPublications[[i]]@Id)

@@ -12,12 +12,50 @@
 
 <meta name="author" content="Richard Thompson" />
 
-<meta name="date" content="2016-07-24" />
+<meta name="date" content="2016-09-21" />
 
-<title>Ungeneanno: Complete example</title>
+<title>UNGeneAnno: Complete example</title>
 
 
 
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
 
 
 
@@ -30,53 +68,56 @@
 
 
 
-<h1 class="title toc-ignore">Ungeneanno: Complete example</h1>
+<h1 class="title toc-ignore">UNGeneAnno: Complete example</h1>
 <h4 class="author"><em>Richard Thompson</em></h4>
-<h4 class="date"><em>2016-07-24</em></h4>
+<h4 class="date"><em>2016-09-21</em></h4>
 
 
 
 <p>UNGeneAnno is written to enable the rapid collation of gene details from publicly available databases, initially those being the NCBI gene and Uniprot databases.</p>
-<p>Further to the original aim, the package also includes the  function which will returns a vector of objects detailing the results of a search of the NCBI PubMed database.</p>
-<p><em>Nota Bene:</em> The package was originally written to collate gene information from Uniport and NIH/NCBI databases, thus alleviating repetitive multiple searches. The aim was both to speed up accessing this data and minimise the number of database calls. This vignette outlines how this is acheived.</p>
+<p>Further to the original aim, the package also includes the <code>getPublicationList</code> function which will returns a vector of objects detailing the results of a journal search of the NCBI PubMed database.</p>
+<p><em>Nota Bene:</em> The package was originally written to collate gene information from Uniprot and NIH/NCBI databases, thus alleviating repetitive searches. The aim was both to speed up “accessing” this data and to minimise the number of database calls, network load and server traffic. This vignette outlines how this is acheived.</p>
 <div id="initial-input-from-file" class="section level2">
-<h2>initial input from file</h2>
-<p>A typical workflow begins with a matrix, wherethe first column represents a group identifier,  or , and the second, gene names.</p>
-<pre><code>1   BRAF.exp
-1   BRCA2.mut
-2   BRAF.cnv
-2   AURKB.mut
-2   PTEN.exp</code></pre>
-<p>The  method parses the input file into a vector of character strings containing only the initial alphanumeric characters, so the above is treat as:</p>
+<h2>Initial Input from File</h2>
+<p>A typical workflow begins with a matrix, wherein the first column represents a group identifier, <code>numeric</code> or <code>character</code>, and the second, gene names. The gene names, may include descriptive elements</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">  f &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="st">&quot;1&quot;</span>,<span class="st">&quot;BRAF.exp&quot;</span>,<span class="st">&quot;1&quot;</span>,<span class="st">&quot;BRCA2.mut&quot;</span>,<span class="st">&quot;2&quot;</span>,<span class="st">&quot;BRAF.cnv&quot;</span>,<span class="st">&quot;2&quot;</span>,<span class="st">&quot;AURKB.mut&quot;</span>,<span class="st">&quot;2&quot;</span>,<span class="st">&quot;PTEN.exp&quot;</span>)
+              ,<span class="dt">ncol=</span><span class="dv">2</span>,<span class="dt">byrow=</span><span class="ot">TRUE</span>)
+  f</code></pre></div>
+<pre><code>##      [,1] [,2]       
+## [1,] &quot;1&quot;  &quot;BRAF.exp&quot; 
+## [2,] &quot;1&quot;  &quot;BRCA2.mut&quot;
+## [3,] &quot;2&quot;  &quot;BRAF.cnv&quot; 
+## [4,] &quot;2&quot;  &quot;AURKB.mut&quot;
+## [5,] &quot;2&quot;  &quot;PTEN.exp&quot;</code></pre>
+<p>The <code>getuniquegenelist</code> function parses second column of the input matrix into a vector of character strings containing only the initial alphanumeric characters, so the above is treat as:</p>
 <pre><code>1   BRAF
 1   BRCA2
 2   BRAF
 2   AURKB
 2   PTEN</code></pre>
-<p>once the matrix is passed to , A geneanno object is populated with unique lists of both the group identifiers and gene names:</p>
-<pre><code>geneanno &lt;- getUniqueGeneList(geneanno(),matrix)</code></pre>
+<p>once the matrix is passed to <code>getuniquegenelist</code>, A geneanno object is populated with unique lists of both the group identifiers and gene names:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">   geneanno &lt;-<span class="st"> </span><span class="kw">getUniqueGeneList</span>(<span class="kw">geneanno</span>(),f)
+   geneanno@genelist</code></pre></div>
+<pre><code>## [1] &quot;BRAF&quot;  &quot;BRCA2&quot; &quot;AURKB&quot; &quot;PTEN&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">   geneanno@groupnos</code></pre></div>
+<pre><code>## [1] &quot;1&quot; &quot;2&quot;</code></pre>
+<p><em>Nota Bene</em> The <code>getuniquegenelist</code> function assumes that all supplied gene names are alphanumeric and anything following is descriptive; therefore the function truncates contents of the second column to the initial alphanumeric characters only.</p>
 </div>
 <div id="getting-gene-objects" class="section level2">
-<h2>Getting Gene objects</h2>
-<p>Once these lists have been populated, the summary information can be sourced from the databases; returning a vector of  objects containing the downloaded details for each gene.</p>
+<h2>Getting Gene Objects</h2>
+<p>Once these lists have been populated, the summary information can be sourced from the databases; returning a vector of <code>gene</code> objects containing the downloaded details for each gene.</p>
 <pre><code>genesummaries &lt;- getGeneSummary(geneanno)</code></pre>
-<p><em>Nota Bene:</em> Once the details have been downloaded, the gene object is saved to a subdirectory, defaults to “genes” which is created in the working directory; However the main directory can be amended using . Prior to downloading, the method will check for a saved gene object younger than seven days and preferentially use any saved objects it finds. This is to minimize repeatedly accessing the database servers with the same query.</p>
+<p>Once the details have been downloaded, the gene object is saved to a subdirectory which defaults to “genes” and is created in the working directory; However the main directory and subdirectory can be amended using <code>geneanno@fileroot &lt;- &quot;/path/to/directory&quot;</code> and <code>geneanno@genefilestem &lt;- &quot;directory_name&quot;</code>. Prior to downloading, the method will check the subdirectory for a saved gene object younger than seven days and preferentially use any saved objects it finds.</p>
 </div>
 <div id="producing-output-files" class="section level2">
-<h2>Producing output files</h2>
-<p>The final task is to produce output files for each group identifier listing details of the genes related to it in the original .</p>
+<h2>Producing Output Files</h2>
+<p>The final task is to produce output files for each group identifier listing details of the genes related to it in the original input matrix.</p>
 <pre><code>groupgenelist &lt;- getGroupGeneList(geneanno,matrix)
 produceOutputFiles(geneanno, groupgenelist, genesummaries)</code></pre>
-<p>Output files are saved in a subdirectory, default “gene_annotations”, of the working directory, unless an alternative directory has been provided by . Currently, the files are created as plain text files, named by the group identifiers, containing all the details stored in the  objects.</p>
-</div>
-<div id="queries-to-the-ncbi-pubmed-database" class="section level2">
-<h2>Queries to the NCBI Pubmed Database</h2>
-<p>In addition to it’s core function the package also incorporates a function to access the NCBI Pubmed database and collate a list of publications for a query. The function will take any query you would use on the PubMed search page directly.</p>
-<pre><code>ReturnedPublications &lt;- getPublicationList(query)</code></pre>
-<p>The returned list contains objects having specific slots for Pubmed ID, Author list, Title, Journal Name, Volume, Issue, Page Numbers and DOI. Indivdual publications can be accessed by index, for example, to get the Pubmed IDs of the returned publications:</p>
-<pre><code>for (i in 1:length(ReturnedPublications)){
-  print(ReturnedPublications[[i]]@Id)
-}</code></pre>
+<p>Optionally, the original matrix can be used to search the NCBI PubMed database and the returned article information incorporated into the output files. Theauthor would like to advise against using the <code>searchPublications</code> function unless the group identifiers are meaningful, for example if they are drug names. Further details can be found in the “<a href="PubMed_Query_Example.html">UNGeneAnno: PubMed Journal Query example</a>” vignette.</p>
+<pre><code>publicationmatrix &lt;- searchPublications(matrix)
+produceOutputFiles(geneanno, groupgenelist, genesummaries, publicationmatrix)</code></pre>
+<p>Output files are saved in a subdirectory, which defaults to “gene_annotations” of the <code>geneanno@fileroot</code> unless an alternative directory has been provided by <code>geneanno@outputstem &lt;- &quot;directory_name&quot;</code>. Currently, the files are created as plain text files, named as the group identifiers, containing the appropriate details stored in the <code>gene</code> objects.</p>
 </div>
 
 

@@ -3,12 +3,15 @@
 \docType{methods}
 \name{produceOutputFiles}
 \alias{produceOutputFiles}
-\alias{produceOutputFiles,geneanno-method}
+\alias{produceOutputFiles,geneanno,vector,vector,missing-method}
+\alias{produceOutputFiles,geneanno,vector,vector,vector-method}
 \title{Save Gene Information to group Specific Output Files}
 \usage{
-produceOutputFiles(x, dgl, gs)
+produceOutputFiles(x, dgl, gs, pub)
 
-\S4method{produceOutputFiles}{geneanno}(x, dgl, gs)
+\S4method{produceOutputFiles}{geneanno,vector,vector,missing}(x, dgl, gs)
+
+\S4method{produceOutputFiles}{geneanno,vector,vector,vector}(x, dgl, gs, pub)
 }
 \arguments{
 \item{x}{object of class geneanno.}
@@ -16,12 +19,16 @@ produceOutputFiles(x, dgl, gs)
 \item{dgl}{a Vector of group specific vectors relating the list of genes to the groups, as in the input file}
 
 \item{gs}{Vector of Gene Summary information downloaded from NIH and Uniprot databases, typically output by getGeneSummary}
+
+\item{pub}{Matrix containing journal article information from the PubMed resource, as retruned by the \code{searchPublications} function}
 }
 \description{
 \code{produceOutputFiles} saves the downloaded gene summary information into group specific files.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{geneanno}: Save object data to text files.
+\item \code{x = geneanno,dgl = vector,gs = vector,pub = missing}: Save object data to text files.
+
+\item \code{x = geneanno,dgl = vector,gs = vector,pub = vector}: Save object data, including journal articles, to text files.
 }}
 
